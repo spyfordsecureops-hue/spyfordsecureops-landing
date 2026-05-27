@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpyfordSecureOps — Enterprise Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue: #2F5BFF;
+    --blue-light: #4F78FF;
+    --blue-glow: rgba(47,91,255,0.15);
+    --blue-soft: rgba(47,91,255,0.08);
+    --bg: #F5F5F5;
+    --card: rgba(255,255,255,0.92);
+    --border: #EAEAEA;
+    --shadow: 0 10px 30px rgba(0,0,0,0.06);
+    --shadow-lg: 0 20px 60px rgba(0,0,0,0.09);
+    --text: #0A0A0A;
+    --muted: #6B7280;
+    --muted-light: #9CA3AF;
+    --radius: 24px;
+    --radius-lg: 32px;
+    --radius-xl: 40px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes floatY {
+    0%,100% { transform: translateY(0px); }
+    50%     { transform: translateY(-8px); }
+  }
+  @keyframes pulse-glow {
+    0%,100% { box-shadow: 0 0 0 0 rgba(47,91,255,0.3); }
+    50%     { box-shadow: 0 0 0 12px rgba(47,91,255,0); }
+  }
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  @keyframes shimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position:  200% center; }
+  }
+  @keyframes scanline {
+    0%   { transform: translateY(-100%); opacity: 0.4; }
+    100% { transform: translateY(400%);  opacity: 0; }
+  }
+  @keyframes blink {
+    0%,100% { opacity: 1; } 50% { opacity: 0; }
+  }
+
+  .fade-up {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ─── NAVBAR ─── */
+  nav {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 32px);
+    max-width: 1100px;
+    z-index: 100;
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 14px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+  }
+
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 17px;
+    color: var(--text);
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-logo-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--blue);
+    animation: pulse-glow 2.5s infinite;
+    flex-shrink: 0;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    list-style: none;
+  }
+  .nav-links a {
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+
+  .nav-cta {
+    background: var(--text);
+    color: #fff !important;
+    padding: 9px 20px !important;
+    border-radius: 12px;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    transition: background 0.2s, transform 0.2s !important;
+  }
+  .nav-cta:hover { background: var(--blue) !important; transform: translateY(-1px); }
+
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 4px;
+  }
+  .hamburger span {
+    display: block;
+    width: 22px; height: 2px;
+    background: var(--text);
+    border-radius: 2px;
+    transition: 0.3s;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 140px 24px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: 50%;
+    transform: translateX(-50%);
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(47,91,255,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 8px 18px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--blue);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    box-shadow: var(--shadow);
+    animation: fadeUp 0.7s ease forwards;
+  }
+  .badge-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--blue);
+    animation: blink 1.8s infinite;
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(42px, 8vw, 88px);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -2px;
+    color: var(--text);
+    max-width: 900px;
+    animation: fadeUp 0.7s 0.15s ease both;
+    margin-bottom: 24px;
+  }
+  .hero h1 .blue { color: var(--blue); }
+
+  .hero-sub {
+    font-size: clamp(16px, 2vw, 19px);
+    color: var(--muted);
+    max-width: 520px;
+    line-height: 1.7;
+    animation: fadeUp 0.7s 0.25s ease both;
+    margin-bottom: 44px;
+  }
+
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    animation: fadeUp 0.7s 0.35s ease both;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--blue);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 16px 34px;
+    border-radius: 16px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 8px 32px rgba(47,91,255,0.35);
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: pulse-glow 3s infinite;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 40px rgba(47,91,255,0.45);
+  }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 16px 28px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-ghost:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+  /* ─── DASHBOARD PREVIEW ─── */
+  .dashboard-section {
+    padding: 40px 24px 100px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .dashboard-card {
+    width: 100%;
+    max-width: 1000px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    position: relative;
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+
+  .dashboard-header {
+    background: rgba(245,245,245,0.8);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .win-dots { display: flex; gap: 7px; }
+  .win-dot {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: #E8E8E8;
+  }
+  .win-dot:nth-child(1) { background: #FF5F56; }
+  .win-dot:nth-child(2) { background: #FFBD2E; }
+  .win-dot:nth-child(3) { background: #27C93F; }
+
+  .dash-search {
+    flex: 1;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  .dash-search-icon { color: var(--blue); font-size: 14px; }
+
+  .cursor { animation: blink 1s infinite; color: var(--blue); }
+
+  .dashboard-body {
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 16px;
+    min-height: 380px;
+  }
+
+  .dash-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .dash-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .dash-nav-item:hover { background: var(--blue-soft); color: var(--blue); }
+  .dash-nav-item.active {
+    background: var(--blue-soft);
+    color: var(--blue);
+    font-weight: 600;
+  }
+  .dash-nav-icon { font-size: 16px; }
+
+  .dash-main { display: flex; flex-direction: column; gap: 14px; }
+
+  .dash-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+  .dash-widget {
+    background: #F9F9FB;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+  }
+  .dash-widget-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted-light);
+    margin-bottom: 8px;
+  }
+  .dash-widget-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+  }
+  .dash-widget-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .dash-widget-badge {
+    display: inline-block;
+    background: rgba(39,201,63,0.1);
+    color: #16A34A;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-top: 6px;
+  }
+  .dash-widget-badge.warn { background: rgba(255,189,46,0.12); color: #B45309; }
+  .dash-widget-badge.blue { background: var(--blue-soft); color: var(--blue); }
+
+  .dash-chart {
+    background: #F9F9FB;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .dash-chart-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .chart-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    height: 60px;
+  }
+  .chart-bar {
+    flex: 1;
+    border-radius: 4px 4px 0 0;
+    background: var(--blue-soft);
+    transition: 0.3s;
+  }
+  .chart-bar.active { background: var(--blue); }
+  .chart-bar:hover { background: var(--blue); opacity: 0.8; }
+
+  .dash-feed {
+    background: #F9F9FB;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+  }
+  .feed-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .feed-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .feed-item:last-child { border-bottom: none; }
+  .feed-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .feed-dot.red { background: #EF4444; }
+  .feed-dot.blue { background: var(--blue); }
+  .feed-dot.green { background: #22C55E; }
+  .feed-dot.orange { background: #F97316; }
+  .feed-text { flex: 1; color: var(--muted); }
+  .feed-time { color: var(--muted-light); font-size: 11px; font-family: 'JetBrains Mono', monospace; }
+
+  /* scanline overlay */
+  .dashboard-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(47,91,255,0.4), transparent);
+    animation: scanline 4s linear infinite;
+    pointer-events: none;
+  }
+
+  /* ─── TRUSTED ─── */
+  .trusted-section {
+    padding: 20px 0 80px;
+    overflow: hidden;
+  }
+  .trusted-label {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted-light);
+    margin-bottom: 32px;
+  }
+  .ticker-wrap { overflow: hidden; }
+  .ticker-track {
+    display: flex;
+    gap: 60px;
+    width: max-content;
+    animation: ticker 22s linear infinite;
+    align-items: center;
+  }
+  .ticker-item {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: #C0C0C0;
+    letter-spacing: -0.3px;
+    white-space: nowrap;
+    transition: 0.3s;
+  }
+  .ticker-item:hover { color: var(--muted); }
+  .ticker-sep { color: #D8D8D8; }
+
+  /* ─── SECTIONS SHARED ─── */
+  .section { padding: 80px 24px; }
+  .section-inner { max-width: 1100px; margin: 0 auto; }
+
+  .section-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--blue);
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 800;
+    line-height: 1.06;
+    letter-spacing: -1.5px;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  .section-sub {
+    font-size: 17px;
+    color: var(--muted);
+    max-width: 520px;
+    line-height: 1.7;
+  }
+
+  .centered { text-align: center; }
+  .centered .section-sub { margin: 0 auto; }
+
+  /* ─── FEATURES ─── */
+  .features-section { padding: 80px 24px; }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 56px;
+  }
+
+  .feature-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 36px 32px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--blue), var(--blue-light));
+    opacity: 0;
+    transition: 0.3s;
+  }
+  .feature-card:hover::before { opacity: 1; }
+
+  .feat-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted-light);
+    margin-bottom: 20px;
+  }
+
+  .feat-icon {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    background: var(--blue-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(47,91,255,0.12);
+  }
+
+  .feat-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 10px;
+    letter-spacing: -0.3px;
+  }
+
+  .feat-desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+
+  /* ─── STATS ─── */
+  .stats-section {
+    padding: 80px 24px;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .stat-cell {
+    background: #fff;
+    padding: 48px 36px;
+    text-align: center;
+    transition: 0.2s;
+  }
+  .stat-cell:hover { background: #FAFAFA; }
+
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 800;
+    color: var(--blue);
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .stat-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+
+  /* ─── INFRASTRUCTURE ─── */
+  .infra-card {
+    background: linear-gradient(145deg, #0A0F1E 0%, #111827 100%);
+    border-radius: var(--radius-xl);
+    padding: clamp(48px, 8vw, 96px) clamp(32px, 6vw, 80px);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .infra-card::before {
+    content: '';
+    position: absolute;
+    top: -100px; left: 50%;
+    transform: translateX(-50%);
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(47,91,255,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .infra-grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(47,91,255,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(47,91,255,0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .infra-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(47,91,255,0.15);
+    border: 1px solid rgba(47,91,255,0.25);
+    border-radius: 50px;
+    padding: 7px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #7BA7FF;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 28px;
+    position: relative;
+  }
+
+  .infra-card h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+    max-width: 700px;
+    margin: 0 auto 20px;
+    position: relative;
+  }
+
+  .infra-card p {
+    font-size: 16px;
+    color: rgba(255,255,255,0.5);
+    max-width: 440px;
+    margin: 0 auto 40px;
+    line-height: 1.7;
+    position: relative;
+  }
+
+  .infra-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    position: relative;
+  }
+
+  .infra-pill {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50px;
+    padding: 8px 18px;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.6);
+    font-family: 'JetBrains Mono', monospace;
+    transition: 0.2s;
+  }
+  .infra-pill:hover {
+    background: rgba(47,91,255,0.15);
+    border-color: rgba(47,91,255,0.3);
+    color: #7BA7FF;
+  }
+
+  /* ─── ARCHITECTURE ─── */
+  .arch-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 700px;
+    margin: 48px auto 0;
+  }
+
+  .arch-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: var(--shadow);
+    transition: 0.3s;
+    cursor: default;
+  }
+  .arch-card:hover {
+    transform: translateX(6px);
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(47,91,255,0.2);
+  }
+
+  .arch-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: var(--blue-soft);
+    border: 1px solid rgba(47,91,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .arch-info { flex: 1; }
+  .arch-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+  .arch-desc { font-size: 13px; color: var(--muted); }
+
+  .arch-status {
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    color: #22C55E;
+    background: rgba(34,197,94,0.08);
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(34,197,94,0.15);
+  }
+
+  /* ─── ANALYTICS ─── */
+  .analytics-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 36px;
+    box-shadow: var(--shadow-lg);
+    max-width: 900px;
+    margin: 48px auto 0;
+  }
+
+  .analytics-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .analytics-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .analytics-range {
+    display: flex;
+    gap: 6px;
+  }
+  .range-pill {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .range-pill.active {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: #fff;
+  }
+  .range-pill:hover:not(.active) { border-color: var(--blue); color: var(--blue); }
+
+  .analytics-graph {
+    position: relative;
+    height: 180px;
+    margin-bottom: 20px;
+  }
+
+  .graph-svg { width: 100%; height: 100%; overflow: visible; }
+
+  .graph-area-fill {
+    fill: url(#blueGrad);
+    opacity: 0.15;
+  }
+  .graph-line {
+    fill: none;
+    stroke: var(--blue);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 8px rgba(47,91,255,0.5));
+  }
+  .graph-dot {
+    fill: #fff;
+    stroke: var(--blue);
+    stroke-width: 2.5;
+    filter: drop-shadow(0 0 6px rgba(47,91,255,0.5));
+  }
+
+  .analytics-meta {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .meta-item { text-align: center; }
+  .meta-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+  .meta-lbl { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  /* ─── CAPABILITIES ─── */
+  .cap-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: clamp(48px, 7vw, 80px);
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .cap-card h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(26px, 4vw, 44px);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    color: var(--text);
+    margin-bottom: 16px;
+    line-height: 1.1;
+  }
+  .cap-card p { color: var(--muted); font-size: 16px; margin-bottom: 36px; line-height: 1.7; }
+
+  .cap-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  .cap-tag {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    transition: 0.2s;
+  }
+  .cap-tag:hover {
+    background: var(--blue-soft);
+    border-color: rgba(47,91,255,0.2);
+    color: var(--blue);
+    transform: translateY(-2px);
+  }
+  .cap-tag-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--blue);
+    flex-shrink: 0;
+  }
+
+  /* ─── API/DEVELOPER ─── */
+  .api-section { padding: 80px 24px; }
+
+  .api-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 48px;
+  }
+
+  .api-main-card {
+    background: #0A0F1E;
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    grid-row: span 2;
+  }
+
+  .api-grid-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(47,91,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(47,91,255,0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .api-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    position: relative;
+  }
+
+  .api-endpoint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: rgba(47,91,255,0.12);
+    border: 1px solid rgba(47,91,255,0.2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  .method { color: #7BA7FF; }
+  .path-text { color: rgba(255,255,255,0.7); }
+  .string-val { color: #A3D977; }
+  .key-val { color: #FFB86C; }
+  .num-val { color: #BD93F9; }
+
+  .code-block {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.65);
+    position: relative;
+  }
+
+  .api-mini {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: 0.3s;
+  }
+  .api-mini:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+
+  .api-mini-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .api-mini-desc { font-size: 13px; color: var(--muted); }
+
+  .deploy-badges { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 4px; }
+  .dbadge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: var(--blue-soft);
+    border: 1px solid rgba(47,91,255,0.15);
+    color: var(--blue);
+    font-weight: 500;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: #fff;
+    border-top: 1px solid var(--border);
+    padding: 64px 24px 36px;
+  }
+
+  .footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .footer-top {
+    display: grid;
+    grid-template-columns: 1.5fr repeat(3, 1fr);
+    gap: 40px;
+    margin-bottom: 52px;
+  }
+
+  .footer-brand-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 12px;
+  }
+
+  .footer-brand-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.65;
+    max-width: 240px;
+    margin-bottom: 20px;
+  }
+
+  .footer-socials { display: flex; gap: 10px; }
+  .social-btn {
+    width: 36px; height: 36px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+    text-decoration: none;
+    color: var(--muted);
+  }
+  .social-btn:hover {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: #fff;
+    transform: translateY(-2px);
+  }
+
+  .footer-col-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text);
+    margin-bottom: 18px;
+  }
+
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .footer-links a {
+    text-decoration: none;
+    font-size: 13px;
+    color: var(--muted);
+    transition: 0.2s;
+  }
+  .footer-links a:hover { color: var(--blue); }
+
+  .footer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .footer-copy { font-size: 12px; color: var(--muted-light); }
+
+  .footer-legal { display: flex; gap: 20px; }
+  .footer-legal a {
+    font-size: 12px;
+    color: var(--muted-light);
+    text-decoration: none;
+    transition: 0.2s;
+  }
+  .footer-legal a:hover { color: var(--muted); }
+
+  /* ─── MOBILE MENU ─── */
+  .mobile-menu {
+    position: fixed;
+    top: 80px;
+    left: 16px; right: 16px;
+    background: rgba(255,255,255,0.97);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px;
+    z-index: 99;
+    box-shadow: var(--shadow-lg);
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a {
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    transition: 0.2s;
+  }
+  .mobile-menu a:hover { background: var(--bg); color: var(--text); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+
+    .dashboard-body { grid-template-columns: 1fr; }
+    .dash-sidebar { display: none; }
+    .dash-row { grid-template-columns: repeat(2, 1fr); }
+    .api-grid { grid-template-columns: 1fr; }
+    .api-main-card { grid-row: span 1; }
+    .footer-top { grid-template-columns: 1fr 1fr; }
+    .analytics-meta { grid-template-columns: repeat(2, 1fr); }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 480px) {
+    .dash-row { grid-template-columns: 1fr; }
+    .footer-top { grid-template-columns: 1fr; }
+    .analytics-meta { grid-template-columns: repeat(2, 1fr); }
+    .hero-actions { flex-direction: column; width: 100%; }
+    .btn-primary, .btn-ghost { width: 100%; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="nav-logo">
+    <div class="nav-logo-dot"></div>
+    SpyfordSecureOps
+  </div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#platform">Platform</a></li>
+    <li><a href="#api">API</a></li>
+    <li><a href="#" class="nav-cta">Get Started</a></li>
+  </ul>
+  <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#features">Features</a>
+  <a href="#platform">Platform</a>
+  <a href="#api">API</a>
+  <a href="#" style="color:#2F5BFF; font-weight:600;">Get Started →</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="badge-dot"></span>
+    Enterprise Intelligence Platform
+  </div>
+  <h1>Cyber Intelligence<br><span class="blue">Reimagined.</span></h1>
+  <p class="hero-sub">
+    Advanced <span style="color:var(--blue);font-weight:600;">threat intelligence</span> and 
+    <span style="color:var(--blue);font-weight:600;">digital investigation</span> infrastructure — 
+    built for enterprise security teams who demand precision at scale.
+  </p>
+  <div class="hero-actions">
+    <a href="#" class="btn-primary">
+      ⚡ Launch Investigation
+    </a>
+    <a href="#platform" class="btn-ghost">
+      View Platform →
+    </a>
+  </div>
+</section>
+
+<!-- DASHBOARD PREVIEW -->
+<section class="dashboard-section fade-up" id="platform">
+  <div class="dashboard-card">
+    <div class="dashboard-header">
+      <div class="win-dots">
+        <div class="win-dot"></div>
+        <div class="win-dot"></div>
+        <div class="win-dot"></div>
+      </div>
+      <div class="dash-search">
+        <span class="dash-search-icon">⌕</span>
+        <span>Investigate target: 192.168.45.12<span class="cursor">_</span></span>
+      </div>
+    </div>
+    <div class="dashboard-body">
+      <div class="dash-sidebar">
+        <div class="dash-nav-item active"><span class="dash-nav-icon">◎</span> Overview</div>
+        <div class="dash-nav-item"><span class="dash-nav-icon">⊡</span> Identities</div>
+        <div class="dash-nav-item"><span class="dash-nav-icon">⚠</span> Threats</div>
+        <div class="dash-nav-item"><span class="dash-nav-icon">◈</span> Network</div>
+        <div class="dash-nav-item"><span class="dash-nav-icon">⊞</span> Correlations</div>
+        <div class="dash-nav-item"><span class="dash-nav-icon">↗</span> Exports</div>
+        <div style="margin-top:auto;">
+          <div class="dash-nav-item"><span class="dash-nav-icon">⊙</span> Settings</div>
+        </div>
+      </div>
+      <div class="dash-main">
+        <div class="dash-row">
+          <div class="dash-widget">
+            <div class="dash-widget-label">Threats Found</div>
+            <div class="dash-widget-val">247</div>
+            <div class="dash-widget-badge warn">+12 today</div>
+          </div>
+          <div class="dash-widget">
+            <div class="dash-widget-label">Risk Score</div>
+            <div class="dash-widget-val">8.4</div>
+            <div class="dash-widget-badge" style="background:rgba(239,68,68,0.1);color:#DC2626;">Critical</div>
+          </div>
+          <div class="dash-widget">
+            <div class="dash-widget-label">Modules Run</div>
+            <div class="dash-widget-val">61</div>
+            <div class="dash-widget-badge blue">Active</div>
+          </div>
+        </div>
+        <div class="dash-chart">
+          <div class="dash-chart-title">Intelligence Activity — Last 14 days</div>
+          <div class="chart-bars">
+            <div class="chart-bar" style="height:35%"></div>
+            <div class="chart-bar" style="height:55%"></div>
+            <div class="chart-bar" style="height:42%"></div>
+            <div class="chart-bar" style="height:70%"></div>
+            <div class="chart-bar" style="height:60%"></div>
+            <div class="chart-bar active" style="height:88%"></div>
+            <div class="chart-bar" style="height:72%"></div>
+            <div class="chart-bar" style="height:65%"></div>
+            <div class="chart-bar" style="height:80%"></div>
+            <div class="chart-bar active" style="height:95%"></div>
+            <div class="chart-bar" style="height:78%"></div>
+            <div class="chart-bar" style="height:85%"></div>
+            <div class="chart-bar" style="height:90%"></div>
+            <div class="chart-bar active" style="height:100%"></div>
+          </div>
+        </div>
+        <div class="dash-feed">
+          <div class="feed-title">Live Intelligence Feed</div>
+          <div class="feed-item">
+            <div class="feed-dot red"></div>
+            <div class="feed-text">Credential breach detected — dark web source</div>
+            <div class="feed-time">00:04</div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-dot blue"></div>
+            <div class="feed-text">Domain correlation match found (94% confidence)</div>
+            <div class="feed-time">00:12</div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-dot orange"></div>
+            <div class="feed-text">IP linked to 3 known threat actor clusters</div>
+            <div class="feed-time">00:21</div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-dot green"></div>
+            <div class="feed-text">Identity cross-reference complete — 8 aliases</div>
+            <div class="feed-time">00:38</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUSTED -->
+<section class="trusted-section fade-up">
+  <div class="trusted-label">Trusted by intelligence teams at</div>
+  <div class="ticker-wrap">
+    <div class="ticker-track">
+      <span class="ticker-item">Nexus Analytics</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">CipherGroup</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">Sentinel Labs</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">Archon Security</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">Prism Intelligence</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">Vector Protect</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">Meridian Cyber</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">Apex Forensics</span><span class="ticker-sep">·</span>
+      <!-- duplicate for seamless loop -->
+      <span class="ticker-item">Nexus Analytics</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">CipherGroup</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">Sentinel Labs</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">Archon Security</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">Prism Intelligence</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">Vector Protect</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">Meridian Cyber</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">Apex Forensics</span><span class="ticker-sep">·</span>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section section" id="features">
+  <div class="section-inner">
+    <div class="centered fade-up">
+      <div class="section-eyebrow">Intelligence Modules</div>
+      <h2 class="section-title">One Platform.<br>Unlimited Intelligence.</h2>
+      <p class="section-sub">Every investigation tool, threat database, and analytics layer — unified in a single enterprise-grade environment.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card fade-up">
+        <div class="feat-num">01</div>
+        <div class="feat-icon">🪪</div>
+        <div class="feat-title">Identity Intelligence</div>
+        <div class="feat-desc">Comprehensive identity resolution across social platforms, public records, and proprietary data sources. Build complete subject profiles in seconds.</div>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feat-num">02</div>
+        <div class="feat-icon">🛡</div>
+        <div class="feat-title">Threat Monitoring</div>
+        <div class="feat-desc">Real-time surveillance of emerging threats, dark web activity, and adversarial infrastructure targeting your organisation or clients.</div>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feat-num">03</div>
+        <div class="feat-icon">🌐</div>
+        <div class="feat-title">Digital Footprint Analysis</div>
+        <div class="feat-desc">Map the complete online presence of any target — domains, IP history, exposed assets, and associated digital artifacts.</div>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feat-num">04</div>
+        <div class="feat-icon">🔓</div>
+        <div class="feat-title">Breach Detection</div>
+        <div class="feat-desc">Instant lookup across 6+ compiled breach databases. Identify compromised credentials, leaked data, and exposure timeline.</div>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feat-num">05</div>
+        <div class="feat-icon">🔗</div>
+        <div class="feat-title">Intelligence Correlation</div>
+        <div class="feat-desc">AI-powered relationship mapping connects disparate data points into coherent intelligence graphs with confidence scoring.</div>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feat-num">06</div>
+        <div class="feat-icon">👨‍👩‍👧</div>
+        <div class="feat-title">Family Protection</div>
+        <div class="feat-desc">Proactive monitoring and digital exposure scanning to protect individuals and their families from online threats and data brokers.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats-section fade-up">
+  <div class="centered" style="margin-bottom:48px;">
+    <div class="section-eyebrow">By the numbers</div>
+    <h2 class="section-title" style="font-size:clamp(24px,4vw,40px);">Platform at Scale</h2>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-cell">
+      <div class="stat-num">900+</div>
+      <div class="stat-label">Intelligence Modules</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num">6+</div>
+      <div class="stat-label">Threat Databases</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num">20K+</div>
+      <div class="stat-label">Investigations Processed</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num">4</div>
+      <div class="stat-label">Export Formats</div>
+    </div>
+  </div>
+</section>
+
+<!-- INFRASTRUCTURE -->
+<section class="section fade-up">
+  <div class="section-inner">
+    <div class="infra-card">
+      <div class="infra-grid-bg"></div>
+      <div class="infra-badge">⬡ Secure by Design</div>
+      <h2>Built on Secure Investigation<br>Infrastructure.</h2>
+      <p>Enterprise-grade architecture with end-to-end encryption, distributed redundancy, and zero-knowledge investigation processing.</p>
+      <div class="infra-pills">
+        <div class="infra-pill">AES-256 Encryption</div>
+        <div class="infra-pill">Zero-Log Policy</div>
+        <div class="infra-pill">SOC 2 Ready</div>
+        <div class="infra-pill">GDPR Compliant</div>
+        <div class="infra-pill">E2E Secure</div>
+        <div class="infra-pill">Multi-Region</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section class="section fade-up">
+  <div class="section-inner">
+    <div class="centered">
+      <div class="section-eyebrow">Architecture</div>
+      <h2 class="section-title">How it works.</h2>
+      <p class="section-sub">Six tightly integrated layers power every investigation from query to insight.</p>
+    </div>
+    <div class="arch-stack">
+      <div class="arch-card fade-up">
+        <div class="arch-icon">🔍</div>
+        <div class="arch-info">
+          <div class="arch-name">Search Engine</div>
+          <div class="arch-desc">Distributed multi-source query execution with sub-second response times</div>
+        </div>
+        <div class="arch-status">LIVE</div>
+      </div>
+      <div class="arch-card fade-up">
+        <div class="arch-icon">⚡</div>
+        <div class="arch-info">
+          <div class="arch-name">API Gateway</div>
+          <div class="arch-desc">Rate-managed, authenticated gateway with full REST + WebSocket support</div>
+        </div>
+        <div class="arch-status">LIVE</div>
+      </div>
+      <div class="arch-card fade-up">
+        <div class="arch-icon">◎</div>
+        <div class="arch-info">
+          <div class="arch-name">Distributed Nodes</div>
+          <div class="arch-desc">Geo-redundant node network ensuring 99.97% uptime and latency optimisation</div>
+        </div>
+        <div class="arch-status">LIVE</div>
+      </div>
+      <div class="arch-card fade-up">
+        <div class="arch-icon">🧠</div>
+        <div class="arch-info">
+          <div class="arch-name">AI Correlation</div>
+          <div class="arch-desc">Machine learning models that identify non-obvious links across fragmented datasets</div>
+        </div>
+        <div class="arch-status">LIVE</div>
+      </div>
+      <div class="arch-card fade-up">
+        <div class="arch-icon">🛠</div>
+        <div class="arch-info">
+          <div class="arch-name">Intelligence Tools</div>
+          <div class="arch-desc">900+ specialised modules spanning identity, finance, network, and threat domains</div>
+        </div>
+        <div class="arch-status">LIVE</div>
+      </div>
+      <div class="arch-card fade-up">
+        <div class="arch-icon">📊</div>
+        <div class="arch-info">
+          <div class="arch-name">Visualisation Layer</div>
+          <div class="arch-desc">Interactive graph intelligence, timeline views, and exportable case reports</div>
+        </div>
+        <div class="arch-status">LIVE</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ANALYTICS VISUALISATION -->
+<section class="section fade-up">
+  <div class="section-inner">
+    <div class="centered">
+      <div class="section-eyebrow">Analytics</div>
+      <h2 class="section-title">Intelligence at a Glance.</h2>
+      <p class="section-sub">Real-time visualisation dashboards that turn raw data into actionable security insights.</p>
+    </div>
+    <div class="analytics-card">
+      <div class="analytics-header">
+        <div class="analytics-title">Threat Activity — Timeline</div>
+        <div class="analytics-range">
+          <div class="range-pill">7D</div>
+          <div class="range-pill active">30D</div>
+          <div class="range-pill">90D</div>
+        </div>
+      </div>
+      <div class="analytics-graph">
+        <svg class="graph-svg" viewBox="0 0 860 180" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="blueGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#2F5BFF"/>
+              <stop offset="100%" stop-color="#2F5BFF" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <polygon class="graph-area-fill"
+            points="0,160 60,140 120,130 180,120 240,100 300,115 360,90 420,70 480,80 540,55 600,65 660,45 720,50 780,30 860,20 860,180 0,180"/>
+          <polyline class="graph-line"
+            points="0,160 60,140 120,130 180,120 240,100 300,115 360,90 420,70 480,80 540,55 600,65 660,45 720,50 780,30 860,20"/>
+          <circle class="graph-dot" cx="540" cy="55" r="5"/>
+          <circle class="graph-dot" cx="780" cy="30" r="5"/>
+          <circle class="graph-dot" cx="860" cy="20" r="6"/>
+        </svg>
+      </div>
+      <div class="analytics-meta">
+        <div class="meta-item">
+          <div class="meta-val" style="color:var(--blue)">2,847</div>
+          <div class="meta-lbl">Events Processed</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-val">↑ 34%</div>
+          <div class="meta-lbl">Activity Growth</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-val">99.7%</div>
+          <div class="meta-lbl">Detection Rate</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-val">1.2s</div>
+          <div class="meta-lbl">Avg Response</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CAPABILITIES -->
+<section class="section fade-up">
+  <div class="section-inner">
+    <div class="cap-card">
+      <div class="section-eyebrow" style="margin-bottom:16px;">Full Capabilities</div>
+      <h2>Every capability you need.<br>Nothing you don't.</h2>
+      <p>A precisely curated toolset for professional investigators, security engineers, and enterprise intelligence teams.</p>
+      <div class="cap-tags">
+        <div class="cap-tag"><span class="cap-tag-dot"></span>Email Lookup</div>
+        <div class="cap-tag"><span class="cap-tag-dot"></span>Phone Intelligence</div>
+        <div class="cap-tag"><span class="cap-tag-dot"></span>IP Geolocation</div>
+        <div class="cap-tag"><span class="cap-tag-dot"></span>Domain History</div>
+        <div class="cap-tag"><span class="cap-tag-dot"></span>WHOIS Analysis</div>
+        <div class="cap-tag"><span class="cap-tag-dot"></span>Dark Web Monitor</div>
+        <div class="cap-tag"><span class="cap-tag-dot"></span>Crypto Tracing</div>
+        <div class="cap-tag"><span class="cap-tag-dot"></span>Social Graph</div>
+        <div class="cap-tag"><span class="cap-tag-dot"></span>Breach Search</div>
+        <div class="cap-tag"><span class="cap-tag-dot"></span>SSL Certificate Intel</div>
+        <div class="cap-tag"><span class="cap-tag-dot"></span>Network Topology</div>
+        <div class="cap-tag"><span class="cap-tag-dot"></span>Malware Detection</div>
+        <div class="cap-tag"><span class="cap-tag-dot"></span>Person Lookup</div>
+        <div class="cap-tag"><span class="cap-tag-dot"></span>PDF Report Export</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- API / DEVELOPER -->
+<section class="api-section section" id="api">
+  <div class="section-inner">
+    <div class="centered fade-up" style="margin-bottom:0;">
+      <div class="section-eyebrow">Developer API</div>
+      <h2 class="section-title">Build on the<br>Intelligence Layer.</h2>
+      <p class="section-sub">Integrate SpyfordSecureOps intelligence directly into your security stack via our clean REST API.</p>
+    </div>
+    <div class="api-grid">
+      <div class="api-main-card fade-up">
+        <div class="api-grid-bg"></div>
+        <div class="api-label">// SpyfordSecureOps API v2</div>
+        <div class="api-endpoint">
+          <span class="method">POST</span> <span class="path-text">/v2/investigate</span>
+        </div>
+        <div class="code-block">
+{<br>
+&nbsp;&nbsp;<span class="key-val">"target"</span>: <span class="string-val">"subject@domain.com"</span>,<br>
+&nbsp;&nbsp;<span class="key-val">"modules"</span>: [<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="string-val">"identity"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="string-val">"breach_check"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="string-val">"social_graph"</span><br>
+&nbsp;&nbsp;],<br>
+&nbsp;&nbsp;<span class="key-val">"depth"</span>: <span class="num-val">3</span>,<br>
+&nbsp;&nbsp;<span class="key-val">"confidence_min"</span>: <span class="num-val">0.85</span><br>
+}<br><br>
+<span style="color:rgba(255,255,255,0.25)">// Response</span><br>
+{<br>
+&nbsp;&nbsp;<span class="key-val">"status"</span>: <span class="string-val">"complete"</span>,<br>
+&nbsp;&nbsp;<span class="key-val">"risk_score"</span>: <span class="num-val">8.4</span>,<br>
+&nbsp;&nbsp;<span class="key-val">"entities"</span>: <span class="num-val">247</span>,<br>
+&nbsp;&nbsp;<span class="key-val">"report_url"</span>: <span class="string-val">"..."</span><br>
+}
+        </div>
+      </div>
+      <div class="api-mini fade-up">
+        <div class="api-mini-title">⚡ REST API</div>
+        <div class="api-mini-desc">Full JSON REST interface with comprehensive endpoint coverage and interactive documentation.</div>
+        <div class="deploy-badges">
+          <span class="dbadge">JSON</span>
+          <span class="dbadge">REST</span>
+          <span class="dbadge">OAuth 2.0</span>
+        </div>
+      </div>
+      <div class="api-mini fade-up">
+        <div class="api-mini-title">🔧 SDKs & Integrations</div>
+        <div class="api-mini-desc">Official libraries and pre-built integrations for rapid deployment in your existing workflows.</div>
+        <div class="deploy-badges">
+          <span class="dbadge">Python</span>
+          <span class="dbadge">Node.js</span>
+          <span class="dbadge">Go</span>
+        </div>
+      </div>
+      <div class="api-mini fade-up">
+        <div class="api-mini-title">⚙ Deployment</div>
+        <div class="api-mini-desc">Cloud-native, on-premise, or hybrid deployment options to meet enterprise security requirements.</div>
+        <div class="deploy-badges">
+          <span class="dbadge">Docker</span>
+          <span class="dbadge">K8s</span>
+          <span class="dbadge">On-Prem</span>
+        </div>
+      </div>
+      <div class="api-mini fade-up">
+        <div class="api-mini-title">📡 Webhooks</div>
+        <div class="api-mini-desc">Real-time event streaming with configurable webhooks for threat alerts and investigation updates.</div>
+        <div class="deploy-badges">
+          <span class="dbadge">WebSocket</span>
+          <span class="dbadge">Events</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand-name">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0;"></div>
+          SpyfordSecureOps
+        </div>
+        <div class="footer-brand-desc">Enterprise cyber intelligence and digital forensics infrastructure for security professionals worldwide.</div>
+        <div class="footer-socials">
+          <a class="social-btn" href="#" title="Twitter">𝕏</a>
+          <a class="social-btn" href="#" title="LinkedIn">in</a>
+          <a class="social-btn" href="#" title="GitHub">⌥</a>
+          <a class="social-btn" href="#" title="Email">✉</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Product</div>
+        <ul class="footer-links">
+          <li><a href="#">Features</a></li>
+          <li><a href="#">Platform</a></li>
+          <li><a href="#">API Docs</a></li>
+          <li><a href="#">Pricing</a></li>
+          <li><a href="#">Changelog</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Company</div>
+        <ul class="footer-links">
+          <li><a href="#">About</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Partners</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Legal</div>
+        <ul class="footer-links">
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#">Security</a></li>
+          <li><a href="#">Compliance</a></li>
+          <li><a href="#">GDPR</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 SpyfordSecureOps. All rights reserved.</div>
+      <div class="footer-legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Cookies</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Mobile menu
+  function toggleMenu() {
+    const menu = document.getElementById('mobileMenu');
+    menu.classList.toggle('open');
+  }
+
+  // Scroll fade-up observer
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        // stagger children
+        const children = e.target.querySelectorAll('.fade-up');
+        children.forEach((c, i) => {
+          setTimeout(() => c.classList.add('visible'), i * 80);
+        });
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // Range pill toggle
+  document.querySelectorAll('.range-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('.range-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+    });
+  });
+
+  // Chart bar hover
+  document.querySelectorAll('.chart-bar').forEach(bar => {
+    bar.addEventListener('mouseenter', () => bar.style.opacity = '0.7');
+    bar.addEventListener('mouseleave', () => bar.style.opacity = '1');
+  });
+
+  // Navbar scroll tint
+  window.addEventListener('scroll', () => {
+    const nav = document.getElementById('navbar');
+    if (window.scrollY > 20) {
+      nav.style.background = 'rgba(255,255,255,0.96)';
+      nav.style.boxShadow = '0 4px 32px rgba(0,0,0,0.1)';
+    } else {
+      nav.style.background = 'rgba(255,255,255,0.88)';
+      nav.style.boxShadow = '0 4px 24px rgba(0,0,0,0.07)';
+    }
+  });
+</script>
+</body>
+</html>
