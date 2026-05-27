@@ -1,14 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Syne, DM_Sans, JetBrains_Mono } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const syne = Syne({
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-heading",
   display: "swap",
 });
 
-const dmSans = DM_Sans({
+const inter = Inter({
   subsets: ["latin"],
   variable: "--font-body",
   display: "swap",
@@ -49,7 +49,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${syne.variable} ${dmSans.variable} ${jetbrainsMono.variable} bg-background`}
+      className={`${plusJakartaSans.variable} ${inter.variable} ${jetbrainsMono.variable} bg-background`}
     >
       <body>{children}</body>
     </html>
