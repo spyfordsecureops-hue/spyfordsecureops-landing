@@ -6,6 +6,9 @@ export function Footer() {
     Legal: ["Privacy", "Terms", "Security Policy", "Cookie Settings"],
   };
 
+  const helplineNumber = "+1 (302) 824-6398";
+  const helplineTel = "tel:+13028246398";
+
   return (
     <footer className="py-16 border-t border-zinc-800">
       <div className="container mx-auto px-6">
@@ -33,6 +36,26 @@ export function Footer() {
               Enterprise-grade security operations platform protecting businesses
               worldwide.
             </p>
+            {/* Support Helpline */}
+            <a
+              href={helplineTel}
+              className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition-colors mb-4"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                />
+              </svg>
+              <span className="text-sm font-medium">{helplineNumber}</span>
+            </a>
             <div className="flex gap-4">
               {["twitter", "github", "linkedin"].map((social) => (
                 <a

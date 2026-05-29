@@ -22,6 +22,8 @@ import {
   ChevronRight,
   Check,
   AlertTriangle,
+  Phone,
+  Headphones,
 } from "lucide-react";
 import { currentUser } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
@@ -32,7 +34,11 @@ type SettingsTab =
   | "notifications"
   | "integrations"
   | "organization"
-  | "appearance";
+  | "appearance"
+  | "support";
+
+const HELPLINE_NUMBER = "+1 (302) 824-6398";
+const HELPLINE_TEL = "tel:+13028246398";
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
@@ -48,6 +54,7 @@ export default function SettingsPage() {
     { id: "integrations" as const, label: "Integrations", icon: Database },
     { id: "organization" as const, label: "Organization", icon: Building },
     { id: "appearance" as const, label: "Appearance", icon: Monitor },
+    { id: "support" as const, label: "Support", icon: Headphones },
   ];
 
   const integrations = [
@@ -662,6 +669,109 @@ export default function SettingsPage() {
                   <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-zinc-700 transition-colors">
                     <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1" />
                   </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "support" && (
+          <div className="max-w-2xl">
+            <h2 className="text-lg font-semibold text-white mb-6">
+              Support & Help
+            </h2>
+
+            <div className="space-y-6">
+              {/* 24/7 Helpline */}
+              <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-5">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 rounded-lg bg-emerald-500/20">
+                    <Phone className="w-6 h-6 text-emerald-400" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-emerald-400 font-semibold text-lg">
+                      24/7 Support Helpline
+                    </h3>
+                    <p className="text-zinc-400 text-sm mt-1 mb-4">
+                      Our security operations team is available around the clock
+                      for urgent investigations and critical incident support.
+                    </p>
+                    <a
+                      href={HELPLINE_TEL}
+                      className="inline-flex items-center gap-3 px-5 py-3 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-white font-semibold transition-colors"
+                    >
+                      <Phone className="w-5 h-5" />
+                      {HELPLINE_NUMBER}
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* Email Support */}
+              <div className="bg-zinc-800/30 border border-zinc-800 rounded-lg p-5">
+                <div className="flex items-start gap-4">
+                  <div className="p-2 rounded-lg bg-zinc-800">
+                    <Mail className="w-5 h-5 text-zinc-400" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-white font-medium">Email Support</h3>
+                    <p className="text-zinc-400 text-sm mt-1">
+                      For non-urgent inquiries and general support requests
+                    </p>
+                    <a
+                      href="mailto:support@spyfordsecureops.io"
+                      className="inline-block mt-3 text-emerald-400 hover:text-emerald-300 transition-colors text-sm"
+                    >
+                      support@spyfordsecureops.io
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* Documentation */}
+              <div className="bg-zinc-800/30 border border-zinc-800 rounded-lg p-5">
+                <div className="flex items-start gap-4">
+                  <div className="p-2 rounded-lg bg-zinc-800">
+                    <Globe className="w-5 h-5 text-zinc-400" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-white font-medium">
+                      Documentation & Resources
+                    </h3>
+                    <p className="text-zinc-400 text-sm mt-1">
+                      Access guides, API documentation, and knowledge base
+                      articles
+                    </p>
+                    <button className="mt-3 px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-sm hover:bg-zinc-700 transition-colors">
+                      View Documentation
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Enterprise Support */}
+              <div className="bg-zinc-800/30 border border-zinc-800 rounded-lg p-5">
+                <div className="flex items-start gap-4">
+                  <div className="p-2 rounded-lg bg-zinc-800">
+                    <Headphones className="w-5 h-5 text-zinc-400" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-white font-medium">
+                      Enterprise Support
+                    </h3>
+                    <p className="text-zinc-400 text-sm mt-1">
+                      Dedicated account management and priority support for
+                      enterprise customers
+                    </p>
+                    <div className="flex items-center gap-3 mt-3">
+                      <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded text-xs">
+                        Active Plan
+                      </span>
+                      <button className="text-sm text-zinc-400 hover:text-white transition-colors">
+                        Contact Account Manager
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

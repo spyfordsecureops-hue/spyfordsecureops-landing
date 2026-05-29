@@ -17,6 +17,7 @@ import {
   LogOut,
   Building2,
   Sparkles,
+  Headphones,
 } from "lucide-react";
 import { useState } from "react";
 import { currentUser } from "@/lib/mock-data";
@@ -32,6 +33,7 @@ const navigation = [
 ];
 
 const bottomNavigation = [
+  { name: "Support", href: "/settings?tab=support", icon: Headphones },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
