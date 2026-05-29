@@ -1,3 +1,5 @@
+"use client";
+
 import { cases, investigations } from "@/lib/mock-data";
 import { formatDate, getStatusColor, getPriorityColor } from "@/lib/utils";
 import {

@@ -424,6 +424,19 @@ export const timelineEvents: TimelineEvent[] = [
   },
 ];
 
+// Re-export for timeline page compatibility
+export const mockTimelineEvents = timelineEvents.map(event => ({
+  id: event.id,
+  timestamp: event.timestamp,
+  title: event.title,
+  description: event.description,
+  type: event.type === "intelligence" ? "alert" : event.type === "case" || event.type === "investigation" ? "action" : event.type,
+  investigationId: event.relatedIds?.investigationId,
+  actor: event.actor,
+}));
+
+export const mockInvestigations = investigations;
+
 export const intelligenceFeeds: IntelligenceFeed[] = [
   {
     id: "intel-001",

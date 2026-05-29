@@ -1,3 +1,5 @@
+"use client";
+
 import { entities } from "@/lib/mock-data";
 import { formatRelativeTime } from "@/lib/utils";
 import {
