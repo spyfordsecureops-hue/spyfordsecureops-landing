@@ -17,7 +17,7 @@ import {
   ZoomOut,
 } from "lucide-react";
 import { mockTimelineEvents, mockInvestigations } from "@/lib/mock-data";
-import { cn, formatDate, formatTime, getEventIcon } from "@/lib/utils";
+import { cn, formatDate, formatTime } from "@/lib/utils";
 
 type TimelineView = "list" | "graph";
 
