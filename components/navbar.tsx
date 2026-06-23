@@ -55,6 +55,15 @@ export function Navbar() {
           </li>
           <li>
             <a
+              href="tel:+13028246398"
+              className="text-sm font-medium text-muted hover:text-foreground transition-colors"
+              aria-label="Call support at +1 (302) 824-6398"
+            >
+              Contact
+            </a>
+          </li>
+          <li>
+            <a
               href="#"
               className="bg-foreground text-white px-5 py-2.5 rounded-xl font-semibold text-[13px] hover:bg-blue hover:-translate-y-0.5 transition-all"
             >
@@ -100,6 +109,13 @@ export function Navbar() {
           onClick={() => setMobileMenuOpen(false)}
         >
           API
+        </a>
+        <a
+          href="tel:+13028246398"
+          className="px-4 py-3 rounded-xl text-[15px] font-medium text-muted hover:bg-background hover:text-foreground transition-colors"
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          Contact: +1 (302) 824-6398
         </a>
         <a
           href="#"
